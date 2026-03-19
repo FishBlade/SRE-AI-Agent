@@ -9,18 +9,6 @@ metadata:
   name: ollama
   namespace: ai-services
 spec:
-  volumes:
-  - name: ollama-storage-volumes
-    persistentVolumeClaim:
-      claimName: ollama-pvc 
-  containers:
-  - name: ollama
-    image: ollama/ollama:latest
-    ports:
-    - containerPort: 11434
-    volumeMounts: 
-    - name: ollama-model-storage
-      mountPath: /root/.ollama # Ollama 默认的模型存储路径
   replicas: 1
   selector:
     matchLabels: { app: ollama }
@@ -33,6 +21,25 @@ spec:
         image: ollama/ollama:latest
         ports:
         - containerPort: 11434
+        volumeMounts: 
+        - name: ollama-storage
+          mountPath: /root/.ollama # Ollama 默认的模型存储路径
+      volumes:
+      - name: ollama-storage
+        persistentVolumeClaim:
+          claimName: ollama-pvc 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-pvc
+  namespace: ai-services
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi 
 ---
 apiVersion: v1
 kind: Service
