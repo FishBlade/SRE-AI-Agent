@@ -1,10 +1,27 @@
-SRE-Ai-Agent
+# SRE-Ai-Agent 部署与访问指南
+快速操作命令
+1. 获取服务与端口
+bash
+复制
+# 查看服务端口绑定
+kubectl get svc
+2. 获取 ArgoCD 凭据
+bash
+复制
+# 获取初始管理员密码
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 
-kubectl get svc #获取服务绑定的端口
+访问信息:
 
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo #获取argocd密码 # Grafana的默认用户名/密码是admin/prom-operator
- 
-AGENT_POD=$(kubectl get pods -l app=sre-agent -o jsonpath='{.items[0].metadata.name}') 
-kubectl logs -f $AGENT_POD #查看系统日志 --之后可以写成shell脚本，方便演示
+ArgoCD: 用户名 admin，密码通过上述命令获取
 
-shell脚本可以快速查询当前绑定的ArgoCD接口和初始密码
+Grafana: 默认用户名/密码为 admin/prom-operator
+
+3. 查看 Agent 日志
+bash
+复制
+# 获取 Agent Pod
+AGENT_POD=$(kubectl get pods -l app=sre-agent -o jsonpath='{.items[0].metadata.name}')
+
+# 实时查看日志
+kubectl logs -f $AGENT_POD
